@@ -335,7 +335,7 @@ app.post("/perMatchResults", async (req, res) => {
       if (a.damage !== b.damage) {
         return b.damage - a.damage;
       }
-      return a.survivalTime - b.survivalTime;
+      return b.survivalTime - a.survivalTime;
     });
 
     playerResult.forEach((item, index) => {
