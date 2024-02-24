@@ -168,8 +168,8 @@ app.post("/overallResults", async (req, res) => {
     }
 
     for (const playerId in playerStatsMap) {
-      const playerDoc = await playerColl.findOne({ _id: ObjectId(playerId) });
-      const teamDoc = await teamColl.findOne({ _id: ObjectId(playerDoc.team) });
+      const playerDoc = await playerColl.findOne({ _id: new ObjectId(playerId) });
+      const teamDoc = await teamColl.findOne({ _id: new ObjectId(playerDoc.team) });
 
       const teamName = teamDoc.name;
       const ign = playerDoc.ign;
@@ -256,8 +256,8 @@ app.post("/perMatchResults", async (req, res) => {
     const playerStatsColl = client.db("briskFlowPmslDB").collection("playerstats");
     const playerColl = client.db("briskFlowPmslDB").collection("players");
 
-    const teamStats = await teamStatsColl.find({ match: ObjectId(matchId) }).toArray();
-    const playerStats = await playerStatsColl.find({ match: ObjectId(matchId) }).toArray();
+    const teamStats = await teamStatsColl.find({ match: new ObjectId(matchId) }).toArray();
+    const playerStats = await playerStatsColl.find({ match: new ObjectId(matchId) }).toArray();
 
     let result = {};
     let teamResult = [];
@@ -265,8 +265,8 @@ app.post("/perMatchResults", async (req, res) => {
 
     for (let i = 0; i < teamStats.length; i++) {
       const data = teamStats[i];
-      const matchDoc = await matchNoColl.findOne({ _id: ObjectId(data.match) });
-      const teamDoc = await teamColl.findOne({ _id: ObjectId(data.team) });
+      const matchDoc = await matchNoColl.findOne({ _id: new ObjectId(data.match) });
+      const teamDoc = await teamColl.findOne({ _id: new ObjectId(data.team) });
 
       const matchNo = matchDoc.matchNumber;
       const teamName = teamDoc.name;
@@ -305,9 +305,9 @@ app.post("/perMatchResults", async (req, res) => {
 
     for (let i = 0; i < playerStats.length; i++) {
       const data = playerStats[i];
-      const matchDoc = await matchNoColl.findOne({ _id: ObjectId(data.match) });
-      const playerDoc = await playerColl.findOne({ _id: ObjectId(data.player) });
-      const teamDoc = await teamColl.findOne({ _id: ObjectId(playerDoc.team) });
+      const matchDoc = await matchNoColl.findOne({ _id: new ObjectId(data.match) });
+      const playerDoc = await playerColl.findOne({ _id: new ObjectId(data.player) });
+      const teamDoc = await teamColl.findOne({ _id: new ObjectId(playerDoc.team) });
 
       const matchNo = matchDoc.matchNumber;
       const teamName = teamDoc.name;
