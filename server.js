@@ -229,7 +229,7 @@ app.post("/overallResults", async (req, res) => {
       if (a.damage !== b.damage) {
         return b.damage - a.damage;
       }
-      return a.dataSurvTime - b.dataSurvTime;
+      return b.dataSurvTime - a.dataSurvTime;
     });
     playerResult.forEach((item, index) => {
       item.cRank = index + 1;
@@ -337,7 +337,7 @@ app.post("/perMatchResults", async (req, res) => {
       if (a.damage !== b.damage) {
         return b.damage - a.damage;
       }
-      return a.dataSurvTime - b.dataSurvTime;
+      return b.dataSurvTime - a.dataSurvTime;
     });
 
     playerResult.forEach((item, index) => {
