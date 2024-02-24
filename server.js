@@ -180,7 +180,7 @@ app.post("/overallResults", async (req, res) => {
       const playerDamageRatio = playerStatsMap[playerId].damage / totalDamage;
       const playerKillRatio = playerStatsMap[playerId].kill / totalKills;
 
-      const MVP = ((playerSurvivalTimeRatio * 0.4) + (playerDamageRatio * 0.4) + (playerKillRatio * 0.2)*100).toFixed(3);
+      const MVP = (((playerSurvivalTimeRatio * 0.4) + (playerDamageRatio * 0.4) + (playerKillRatio * 0.2))*100).toFixed(3);
       const survTime = playerStatsMap[playerId].survivalTime/ playerStatsMap[playerId].matchPlayed;
       const avgSurvTime = toHHMMSS(survTime);
       playerResult.push({
