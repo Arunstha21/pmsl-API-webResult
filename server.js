@@ -213,7 +213,7 @@ app.post("/overallResults", async (req, res) => {
         return b.kill - a.kill;
       }
 
-      return a.rank - b.rank;
+      return a.lastMatchRank - b.lastMatchRank;
     });
     teamResult.forEach((item, index) => {
       item.cRank = index + 1;
