@@ -190,6 +190,7 @@ app.post("/overallResults", async (req, res) => {
         kill: playerStatsMap[playerId].kill,
         damage: playerStatsMap[playerId].damage,
         matchPlayed: playerStatsMap[playerId].matchPlayed,
+        dataSurvTime: survTime,
         survivalTime: avgSurvTime,
         assist: playerStatsMap[playerId].assist,
         heal: playerStatsMap[playerId].heal,
@@ -228,7 +229,7 @@ app.post("/overallResults", async (req, res) => {
       if (a.damage !== b.damage) {
         return b.damage - a.damage;
       }
-      return a.survivalTime - b.survivalTime;
+      return a.dataSurvTime - b.dataSurvTime;
     });
     playerResult.forEach((item, index) => {
       item.cRank = index + 1;
@@ -321,6 +322,7 @@ app.post("/perMatchResults", async (req, res) => {
         uId: uId,
         kill: data.kill,
         damage: data.damage,
+        dataSurvTime: data.survivalTime,
         survivalTime: toHHMMSS(data.survivalTime),
         assist: data.assist,
         heal: data.heal,
@@ -335,7 +337,7 @@ app.post("/perMatchResults", async (req, res) => {
       if (a.damage !== b.damage) {
         return b.damage - a.damage;
       }
-      return a.survivalTime - b.survivalTime;
+      return a.dataSurvTime - b.dataSurvTime;
     });
 
     playerResult.forEach((item, index) => {
