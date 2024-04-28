@@ -355,3 +355,115 @@ app.post("/perMatchResults", async (req, res) => {
     res.status(500).json({ error: "Error while fetching data" });
   }
 });
+
+app.post("/api/topTenMvps", async (req, res) => {
+  try {
+    const matchIds = req.body.matchIds;
+
+    const playerStatsColl = client.db("briskFlowPmslDB").collection("playerstats");
+    const matchNoColl = client.db("briskFlowPmslDB").collection("matches");
+    const teamColl = client.db("briskFlowPmslDB").collection("teams");
+    const playerColl = client.db("briskFlowPmslDB").collection("players");
+
+    let result = {};
+    let playerResult = [];
+
+    const playerStatsMap = {};
+
+    let totalSurvivalTime = 0;
+    let totalDamage = 0;
+    let totalKills = 0;
+
+    for (const matchId of matchIds) {
+      const match = await matchNoColl.findOne({ _id: new ObjectId(matchId) });
+
+      if (!match) {
+        console.error(`Match with ID ${matchId} not found`);
+        continue;
+      }
+
+      const playerStats = await playerStatsColl.find({ match: new ObjectId(matchId) }).toArray();
+
+      for (const data of playerStats) {
+        const playerId = data.player;
+
+        if (!playerStatsMap[playerId]) {
+          playerStatsMap[playerId] = {
+            kill: 0,
+            damage: 0,
+            survivalTime: 0,
+            assist: 0,
+            heal: 0,
+            headshot: 0,
+            matchPlayed: 0,
+          };
+        }
+
+        playerStatsMap[playerId].matchPlayed++;
+        playerStatsMap[playerId].kill += data.kill;
+        playerStatsMap[playerId].damage += data.damage;
+        playerStatsMap[playerId].survivalTime += data.survivalTime;
+        playerStatsMap[playerId].assist += data.assist;
+        playerStatsMap[playerId].heal += data.heal;
+        playerStatsMap[playerId].headshot += data.headshot;
+        totalSurvivalTime += data.survivalTime;
+        totalDamage += data.damage;
+        totalKills += data.kill;
+      }
+    }
+
+    for (const playerId in playerStatsMap) {
+      const playerDoc = await playerColl.findOne({ _id: new ObjectId(playerId) });
+      const teamDoc = await teamColl.findOne({ _id: new ObjectId(playerDoc.team) });
+
+      const teamName = teamDoc.name;
+      const ign = playerDoc.ign;
+      const uId = playerDoc.uId;
+
+      const playerSurvivalTimeRatio = playerStatsMap[playerId].survivalTime / totalSurvivalTime;
+      const playerDamageRatio = playerStatsMap[playerId].damage / totalDamage;
+      const playerKillRatio = playerStatsMap[playerId].kill / totalKills;
+
+      const MVP = (((playerSurvivalTimeRatio * 0.4) + (playerDamageRatio * 0.4) + (playerKillRatio * 0.2))*100).toFixed(3);
+      const survTime = playerStatsMap[playerId].survivalTime/ playerStatsMap[playerId].matchPlayed;
+      const avgSurvTime = toHHMMSS(survTime);
+      playerResult.push({
+        teamName: teamName,
+        inGameName: ign,
+        uId: uId,
+        kill: playerStatsMap[playerId].kill,
+        damage: playerStatsMap[playerId].damage,
+        matchPlayed: playerStatsMap[playerId].matchPlayed,
+        dataSurvTime: survTime,
+        survivalTime: avgSurvTime,
+        assist: playerStatsMap[playerId].assist,
+        heal: playerStatsMap[playerId].heal,
+        headshot: playerStatsMap[playerId].headshot,
+        mvp: MVP,
+      });
+    }
+
+    playerResult.sort((a, b) => {
+      if (a.mvp !== b.mvp) {
+        return b.mvp - a.mvp;
+      }
+      if (a.kill !== b.kill) {
+        return b.kill - a.kill;
+      }
+      if (a.damage !== b.damage) {
+        return b.damage - a.damage;
+      }
+      return b.dataSurvTime - a.dataSurvTime;
+    });
+    playerResult.forEach((item, index) => {
+      item.cRank = index + 1;
+    });
+
+    playerResult = playerResult.slice(0, 10);
+
+    res.status(200).json({ playerResult });
+  } catch (err) {
+    console.error("Error while fetching data:", err);
+    res.status(500).json({ error: "Error while fetching data" });
+  }
+});
