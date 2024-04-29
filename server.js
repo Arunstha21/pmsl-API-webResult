@@ -22,7 +22,7 @@ app.get('/', function (req, res) {
 });
 
 
-app.get("/gesData", async (req, res) => {
+app.get("/api/gesData", async (req, res) => {
   try {
     const event = await client.db("briskFlowPmslDB").collection("events").find({}).toArray();
     const stage = await client.db("briskFlowPmslDB").collection("stages").find({}).toArray();
@@ -64,7 +64,7 @@ const toHHMMSS = (secs) => {
       .join(":")
 }
 
-app.post("/overallResults", async (req, res) => {
+app.post("/api/overallResults", async (req, res) => {
   try {
     const matchIds = req.body.matchIds;
 
@@ -246,7 +246,7 @@ app.post("/overallResults", async (req, res) => {
   }
 });
 
-app.post("/perMatchResults", async (req, res) => {
+app.post("/api/perMatchResults", async (req, res) => {
   try {
     const matchId = req.body.matchId;
 
@@ -467,3 +467,7 @@ app.post("/api/topTenMvps", async (req, res) => {
     res.status(500).json({ error: "Error while fetching data" });
   }
 });
+
+app.get('/check', (req, res) => {
+  res.status(200).json({status: 200, message : "Check Function Running !!"});
+})
